@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Task Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto; 
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center;
+            width: 100%; 
+            margin-bottom: 30px;
+            border-bottom: 1px solid #ddd;
+            text-align: center; 
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 20px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .filters {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .task-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-list h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .task-card {
+            background-color: #f9f9f9;
+            border-left: 4px solid #489edb;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .task-card h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .task-card p {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .task-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background-color: #ffd700;
+            color: #333;
+        }
+
+        .status-in-progress {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .status-completed {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .task-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .task-actions button {
+            width: auto;
+            padding: 8px 16px;
+        }
+
+        .update-btn {
+            background-color: #2196F3;
+        }
+
+        .update-btn:hover {
+            background-color: #1976D2;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+
+            .filters {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .filter-group {
+                min-width: 100%;
+            }
+        }
+
+        .priority-low {
+            color: green;
+        }
+        .priority-medium {
+            color: orange;
+        }
+        .priority-high {
+            color: red;
+            font-weight: bold;
+        }
+        .priority-urgent {
+            color: darkred;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header>
+            <h1>Employee Task Management</h1>
+            <p class="quote">"Productivity is never an accident."</p>
+        </header>
+
+        <div class="main-content">
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="statusFilter">Filter by Status:</label>
+                    <select id="statusFilter" onchange="loadEmployeeTasks()">
+                        <option value="all">All</option>
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="priorityFilter">Filter by Priority:</label>
+                    <select id="priorityFilter" onchange="loadEmployeeTasks()">
+                        <option value="all">All</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="taskSearch">Search by Task Name:</label>
+                    <input type="text" id="taskSearch" placeholder="Enter task name" oninput="loadEmployeeTasks()">
+                </div>
+            </div>
+
+            <div class="task-list">
+                <h2>My Tasks</h2>
+                <div id="myTasks"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/tasks';
+
+        async function loadEmployeeTasks() {
+            const selectedStatus = document.getElementById('statusFilter').value;
+            const selectedPriority = document.getElementById('priorityFilter').value;
+            const searchQuery = document.getElementById('taskSearch').value.trim().toLowerCase();
+            const myTasksElement = document.getElementById('myTasks');
+            myTasksElement.innerHTML = '<p>Loading tasks...</p>';
+
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to fetch tasks');
+                }
+                let tasks = await response.json();
+
+                // Parse updates field if it's a string
+                tasks = tasks.map(task => {
+                    if (typeof task.updates === 'string') {
+                        try {
+                            task.updates = JSON.parse(task.updates);
+                        } catch (e) {
+                            console.error('Error parsing updates for task', task.id, e);
+                            task.updates = [];
+                        }
+                    }
+                    if (!Array.isArray(task.updates)) {
+                        task.updates = [];
+                    }
+                    return task;
+                });
+
+                // Apply filters
+                let filteredTasks = tasks;
+                if (selectedStatus !== 'all') {
+                    filteredTasks = filteredTasks.filter(task => task.status === selectedStatus);
+                }
+                if (selectedPriority !== 'all') {
+                    filteredTasks = filteredTasks.filter(task => task.priority === selectedPriority);
+                }
+                if (searchQuery) {
+                    filteredTasks = filteredTasks.filter(task => task.title.toLowerCase().includes(searchQuery));
+                }
+
+                myTasksElement.innerHTML = '';
+                if (filteredTasks.length === 0) {
+                    myTasksElement.innerHTML = '<p>No tasks found for the selected criteria.</p>';
+                    return;
+                }
+
+                filteredTasks.forEach(task => {
+                    const taskElement = document.createElement('div');
+                    taskElement.className = 'task-card';
+                    taskElement.innerHTML = `
+                        <h3>${task.title}</h3>
+                        <p><strong>Priority:</strong> <span class="priority-${task.priority}">${task.priority}</span></p>
+                        <p><strong>Deadline:</strong> ${task.deadline}</p>
+                        <p><strong>Description:</strong> ${task.description}</p>
+                        <p><strong>Status:</strong> <span class="task-status status-${task.status}">${task.status}</span></p>
+                        ${task.updates.map(update => `
+                            <div class="update-entry">
+                                <p><strong>Update:</strong> ${update.text}</p>
+                                <p><small>Updated on: ${new Date(update.timestamp).toLocaleString()}</small></p>
+                            </div>
+                        `).join('')}
+                        <div class="task-actions">
+                            <select id="status-${task.id}">
+                                <option value="pending" ${task.status === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="in-progress" ${task.status === 'in-progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="completed" ${task.status === 'completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                            <input type="text" id="update-${task.id}" placeholder="Add an update (letters only, single spaces)" 
+                                   oninput="validateUpdateInput(this)">
+                            <button onclick="updateTask(${task.id})" class="update-btn">Update</button>
+                            <p id="error-${task.id}" class="error-message" style="color:red;display:none;"></p>
+                        </div>
+                    `;
+                    myTasksElement.appendChild(taskElement);
+                });
+            } catch (err) {
+                console.error('Error loading tasks:', err);
+                myTasksElement.innerHTML = '<p>Error loading tasks: ' + err.message + '</p>';
+            }
+        }
+
+        function validateUpdateInput(inputElement) {
+            const taskId = inputElement.id.split('-')[1];
+            const errorElement = document.getElementById(`error-${taskId}`);
+            let value = inputElement.value;
+            
+            const startPos = inputElement.selectionStart;
+            const endPos = inputElement.selectionEnd;
+            
+            const isAddingSpace = value.length > 0 && value[value.length - 1] === ' ';
+            
+            let newValue = value.replace(/[^a-zA-Z ]/g, '');
+            
+            if (!isAddingSpace) {
+                newValue = newValue.replace(/\s+/g, ' ');
+            }
+            
+            if (!isAddingSpace && startPos !== value.length) {
+                newValue = newValue.trim();
+            }
+            
+            if (value !== newValue) {
+                inputElement.value = newValue;
+                
+                const diff = value.length - newValue.length;
+                inputElement.selectionStart = Math.max(startPos - diff, 0);
+                inputElement.selectionEnd = Math.max(endPos - diff, 0);
+            }
+            
+            if (/[^a-zA-Z ]/.test(value)) {
+                errorElement.textContent = "Only letters and single spaces between words are allowed";
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.style.display = 'none';
+            }
+        }
+
+        async function updateTask(taskId) {
+            const newStatus = document.getElementById(`status-${taskId}`).value;
+            const updateInput = document.getElementById(`update-${taskId}`);
+            let updateText = updateInput.value;
+            const errorElement = document.getElementById(`error-${taskId}`);
+            
+            if (/[^a-zA-Z ]/.test(updateText)) {
+                errorElement.textContent = "Update contains invalid characters. Only letters and single spaces allowed.";
+                errorElement.style.display = 'block';
+                return;
+            }
+            
+            if (updateText && (updateText !== updateText.trim() || updateText.includes('  '))) {
+                errorElement.textContent = "Only single spaces between words are allowed, with no leading/trailing spaces";
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            try {
+                // Fetch the specific task by ID
+                const response = await fetch(`${API_URL}/${taskId}`);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to fetch task');
+                }
+                let task = await response.json();
+
+                // Parse updates if it's a string
+                if (typeof task.updates === 'string') {
+                    try {
+                        task.updates = JSON.parse(task.updates);
+                    } catch (e) {
+                        console.error('Error parsing updates for task', task.id, e);
+                        task.updates = [];
+                    }
+                }
+                if (!Array.isArray(task.updates)) {
+                    task.updates = [];
+                }
+
+                // Update status and add new update
+                task.status = newStatus;
+                if (updateText.trim()) {
+                    task.updates.push({
+                        text: updateText,
+                        timestamp: Date.now()
+                    });
+                }
+
+                // Send update to backend
+                console.log('Sending update for task', taskId, { status: task.status, updates: task.updates });
+                const updateResponse = await fetch(`${API_URL}/${taskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: task.status, updates: task.updates })
+                });
+
+                if (!updateResponse.ok) {
+                    const errorData = await updateResponse.json();
+                    throw new Error(errorData.error || 'Failed to update task');
+                }
+
+                // Clear input and refresh tasks
+                updateInput.value = '';
+                loadEmployeeTasks();
+                alert('Task updated successfully!');
+            } catch (err) {
+                console.error('Error updating task:', err);
+                alert('Error updating task: ' + err.message);
+            }
+        }
+
+        window.onload = loadEmployeeTasks;
+    </script>
+</body>
+</html>

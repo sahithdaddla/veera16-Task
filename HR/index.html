@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Task Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            line-height: 1.6;
+            background-color: #f5f7fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .welcome-screen {
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .welcome-screen h1 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        
+        .portal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .portal-btn {
+            display: inline-block;
+            padding: 20px 40px;
+            font-size: 1.2em;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 220px;
+        }
+        
+        .portal-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        .hr-btn {
+            background: linear-gradient(135deg, #2196F3, #00bcd4);
+            color: white;
+        }
+        
+        .employee-btn {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.2);
+            outline: none;
+        }
+        
+        textarea {
+            resize: none;
+            min-height: 120px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .main-content {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .main-content.split {
+            justify-content: space-between;
+        }
+        
+        .task-form {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 400px;
+            transition: all 0.3s ease;
+        }
+        
+        .main-content.split .task-form {
+            width: 36%;
+            max-width: none;
+        }
+        
+        .task-form h2 {
+            margin-bottom: 25px;
+            color: #2c3e50;
+            font-size: 1.8em;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .task-list {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            width: 60%;
+            max-width: none;
+            display: none;
+        }
+        
+        .main-content.split .task-list {
+            display: block;
+        }
+        
+        .task-list h2 {
+            margin-bottom: 25px;
+            color: #2c3e50;
+            font-size: 1.8em;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .task-card {
+            background-color: white;
+            border-left: 5px solid;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        .task-card.pending {
+            border-left-color: #FFC107;
+            background: linear-gradient(90deg, white 0%, rgba(255,193,7,0.05) 100%);
+        }
+        
+        .task-card.in-progress {
+            border-left-color: #2196F3;
+            background: linear-gradient(90deg, white 0%, rgba(33,150,243,0.05) 100%);
+        }
+        
+        .task-card.completed {
+            border-left-color: #4CAF50;
+            background: linear-gradient(90deg, white 0%, rgba(76,175,80,0.05) 100%);
+        }
+        
+        .task-card h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 1.3em;
+        }
+        
+        .task-card p {
+            margin-bottom: 10px;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .task-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .status-pending {
+            background-color: #FFF3E0;
+            color: #FF8F00;
+        }
+        
+        .status-in-progress {
+            background-color: #E3F2FD;
+            color: #1565C0;
+        }
+        
+        .status-completed {
+            background-color: #E8F5E9;
+            color: #2E7D32;
+        }
+        
+        .task-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .task-actions button {
+            width: auto;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+        
+        .update-btn {
+            background: linear-gradient(135deg, #2196F3, #00bcd4);
+        }
+        
+        .delete-btn {
+            background: linear-gradient(135deg, #f44336, #e53935);
+        }
+        
+        .update-btn:hover {
+            background: linear-gradient(135deg, #1976D2, #0097A7);
+        }
+        
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #e53935, #c62828);
+        }
+        
+        @media (max-width: 768px) {
+            .main-content.split {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .main-content.split .task-form,
+            .main-content.split .task-list {
+                width: 100%;
+                max-width: 500px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .portal-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .portal-btn {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            
+            .welcome-screen {
+                padding: 30px 15px;
+            }
+            
+            .welcome-screen h1 {
+                font-size: 2em;
+                margin-bottom: 30px;
+            }
+        }
+        
+        .priority-low {
+            color: green;
+        }
+        .priority-medium {
+            color: orange;
+        }
+        .priority-high {
+            color: red;
+            font-weight: bold;
+        }
+        .priority-urgent {
+            color: darkred;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>HR Task Management</h1>
+        <p>"Where strategic HR meets operational excellence"</p>
+    </header>
+    <div class="dashboard">
+        <div class="main-content" id="mainContent">
+            <div class="task-form">
+                <h2>Create New Task</h2>
+                <div class="form-group">
+                    <label for="taskTitle">Task Title:</label>
+                    <input type="text" id="taskTitle" required maxlength="30" 
+                           onblur="validateAndCleanField(this)">
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">Description:</label>
+                    <textarea id="taskDescription" rows="3" required maxlength="100"
+                              onblur="validateAndCleanField(this)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="deadline">Deadline:</label>
+                    <input type="date" id="deadline" required min="">
+                </div>
+                <div class="form-group">
+                    <label for="priority">Priority:</label>
+                    <select id="priority" required>
+                        <option value="">Select Priority</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                </div>
+                <button onclick="createTask()">Assign Task</button>
+            </div>
+            <div class="task-list" id="taskList">
+                <h2>Assigned Tasks</h2>
+                <div id="tasksList"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const API_URL = 'http://localhost:3000/api/tasks';
+
+        window.onload = function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('deadline').min = today;
+            loadTasks();
+        };
+
+        let alertShown = false;
+
+        function isBlank(str) {
+            return !str || !str.trim();
+        }
+        
+        function isValidInput(str) {
+            if (isBlank(str)) return false;
+            if (!/^[A-Z]/.test(str)) return false;
+            if (/\s{2,}/.test(str)) return false;
+            return true;
+        }
+        
+        function cleanInput(str) {
+            if (isBlank(str)) return str;
+            str = str.trim();
+            str = str.charAt(0).toUpperCase() + str.slice(1);
+            str = str.replace(/\s{2,}/g, ' ');
+            return str;
+        }
+
+        function validateAndCleanField(inputElement) {
+            const originalValue = inputElement.value;
+            const cleanedValue = cleanInput(originalValue);
+            
+            if (cleanedValue !== originalValue) {
+                inputElement.value = cleanedValue;
+            }
+            
+            if (!isValidInput(cleanedValue) && !alertShown) {
+                alertShown = true;
+                if (isBlank(cleanedValue)) {
+                    alert('This field cannot be empty');
+                } else if (!/^[A-Z]/.test(cleanedValue)) {
+                    alert('Please start with a capital letter');
+                } else if (/\s{2,}/.test(cleanedValue)) {
+                    alert('Please use only single spaces between words');
+                }
+                inputElement.focus();
+                setTimeout(() => { alertShown = false; }, 100);
+                return false;
+            }
+            return true;
+        }
+
+        async function createTask() {
+            const titleElement = document.getElementById('taskTitle');
+            const descriptionElement = document.getElementById('taskDescription');
+            const deadlineInput = document.getElementById('deadline');
+            const priority = document.getElementById('priority').value;
+
+            alertShown = false;
+            
+            if (!validateAndCleanField(titleElement) || 
+                !validateAndCleanField(descriptionElement)) {
+                return;
+            }
+
+            const title = titleElement.value;
+            const description = descriptionElement.value;
+            const deadline = deadlineInput.value;
+
+            if (!title || !description || !deadline || !priority) {
+                if (!alertShown) {
+                    alertShown = true;
+                    alert('Please fill in all fields');
+                    setTimeout(() => { alertShown = false; }, 100);
+                }
+                return;
+            }
+
+            if (!isValidDate(deadline)) {
+                if (!alertShown) {
+                    alertShown = true;
+                    alert('Please enter a valid future date (between today and 2100)');
+                    setTimeout(() => { alertShown = false; }, 100);
+                }
+                return;
+            }
+
+            const newTask = {
+                id: Date.now(),
+                title,
+                description,
+                deadline,
+                priority,
+                status: 'pending',
+                updates: []
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newTask)
+                });
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to create task');
+                }
+                document.getElementById('taskTitle').value = '';
+                document.getElementById('taskDescription').value = '';
+                document.getElementById('deadline').value = '';
+                document.getElementById('priority').value = '';
+                loadTasks();
+                alert('Task assigned successfully!');
+            } catch (err) {
+                console.error('Error creating task:', err);
+                alert('Error assigning task: ' + err.message);
+            }
+        }
+
+        function isValidDate(dateString) {
+            if (!dateString) return false;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const inputDate = new Date(dateString);
+            const year = inputDate.getFullYear();
+            return !isNaN(inputDate.getTime()) && 
+                   year >= today.getFullYear() && 
+                   year <= 2100 &&
+                   inputDate >= today;
+        }
+
+        async function loadTasks() {
+            const tasksListElement = document.getElementById('tasksList');
+            const mainContent = document.getElementById('mainContent');
+            tasksListElement.innerHTML = '<p>Loading tasks...</p>';
+
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to fetch tasks');
+                }
+                const tasks = await response.json();
+
+                // Parse updates field if it's a string
+                tasks.forEach(task => {
+                    if (typeof task.updates === 'string') {
+                        try {
+                            task.updates = JSON.parse(task.updates);
+                        } catch (e) {
+                            console.error('Error parsing updates for task', task.id, e);
+                            task.updates = [];
+                        }
+                    }
+                    if (!Array.isArray(task.updates)) {
+                        task.updates = [];
+                    }
+                });
+
+                tasksListElement.innerHTML = '';
+                if (tasks.length > 0) {
+                    mainContent.classList.add('split');
+                } else {
+                    mainContent.classList.remove('split');
+                    tasksListElement.innerHTML = '<p>No tasks available.</p>';
+                    return;
+                }
+
+                tasks.forEach(task => {
+                    const taskElement = document.createElement('div');
+                    taskElement.className = `task-card ${task.status}`;
+                    taskElement.innerHTML = `
+                        <h3>${task.title}</h3>
+                        <p><strong>Priority:</strong> <span class="priority-${task.priority}">${task.priority}</span></p>
+                        <p><strong>Deadline:</strong> ${task.deadline}</p>
+                        <p><strong>Description:</strong> ${task.description}</p>
+                        <p><strong>Status:</strong> <span class="task-status status-${task.status}">${task.status}</span></p>
+                        ${task.updates.map(update => `
+                            <div class="update-entry">
+                                <p><strong>Update:</strong> ${update.text}</p>
+                                <p><small>Updated on: ${new Date(update.timestamp).toLocaleString()}</small></p>
+                            </div>
+                        `).join('')}
+                    `;
+                    tasksListElement.appendChild(taskElement);
+                });
+            } catch (err) {
+                console.error('Error loading tasks:', err);
+                tasksListElement.innerHTML = '<p>Error loading tasks: ' + err.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>
