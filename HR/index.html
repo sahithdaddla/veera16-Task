@@ -358,11 +358,13 @@
                 <div class="form-group">
                     <label for="taskTitle">Task Title:</label>
                     <input type="text" id="taskTitle" required maxlength="30" 
+                           oninput="restrictInput(this)"
                            onblur="validateAndCleanField(this)">
                 </div>
                 <div class="form-group">
                     <label for="taskDescription">Description:</label>
                     <textarea id="taskDescription" rows="3" required maxlength="100"
+                              oninput="restrictInput(this)"
                               onblur="validateAndCleanField(this)"></textarea>
                 </div>
                 <div class="form-group">
@@ -391,8 +393,13 @@
         const API_URL = 'http://localhost:3000/api/tasks';
 
         window.onload = function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('deadline').min = today;
+            const today = new Date();
+            const minDate = today.toISOString().split('T')[0];
+            const maxYear = today.getFullYear() + 10;
+            const maxDate = `${maxYear}-12-31`;
+            const deadlineInput = document.getElementById('deadline');
+            deadlineInput.min = minDate;
+            deadlineInput.max = maxDate;
             loadTasks();
         };
 
@@ -406,6 +413,7 @@
             if (isBlank(str)) return false;
             if (!/^[A-Z]/.test(str)) return false;
             if (/\s{2,}/.test(str)) return false;
+            if (!/^[A-Za-z0-9\s.,!?-]+$/.test(str)) return false;
             return true;
         }
         
@@ -415,6 +423,11 @@
             str = str.charAt(0).toUpperCase() + str.slice(1);
             str = str.replace(/\s{2,}/g, ' ');
             return str;
+        }
+
+        function restrictInput(element) {
+            // Allow only alphanumeric, spaces, and standard punctuation (.,!?-)
+            element.value = element.value.replace(/[^A-Za-z0-9\s.,!?-]/g, '');
         }
 
         function validateAndCleanField(inputElement) {
@@ -433,12 +446,24 @@
                     alert('Please start with a capital letter');
                 } else if (/\s{2,}/.test(cleanedValue)) {
                     alert('Please use only single spaces between words');
+                } else if (!/^[A-Za-z0-9\s.,!?-]+$/.test(cleanedValue)) {
+                    alert('Only alphanumeric characters and standard punctuation (.,!?-) are allowed');
                 }
                 inputElement.focus();
                 setTimeout(() => { alertShown = false; }, 100);
                 return false;
             }
             return true;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
         }
 
         async function createTask() {
@@ -470,7 +495,7 @@
             if (!isValidDate(deadline)) {
                 if (!alertShown) {
                     alertShown = true;
-                    alert('Please enter a valid future date (between today and 2100)');
+                    alert(`Please enter a valid date between today and 31 Dec ${new Date().getFullYear() + 10}`);
                     setTimeout(() => { alertShown = false; }, 100);
                 }
                 return;
@@ -513,10 +538,11 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const inputDate = new Date(dateString);
+            const maxYear = today.getFullYear() + 10;
             const year = inputDate.getFullYear();
             return !isNaN(inputDate.getTime()) && 
                    year >= today.getFullYear() && 
-                   year <= 2100 &&
+                   year <= maxYear &&
                    inputDate >= today;
         }
 
@@ -563,7 +589,7 @@
                     taskElement.innerHTML = `
                         <h3>${task.title}</h3>
                         <p><strong>Priority:</strong> <span class="priority-${task.priority}">${task.priority}</span></p>
-                        <p><strong>Deadline:</strong> ${task.deadline}</p>
+                        <p><strong>Deadline:</strong> ${formatDate(task.deadline)}</p>
                         <p><strong>Description:</strong> ${task.description}</p>
                         <p><strong>Status:</strong> <span class="task-status status-${task.status}">${task.status}</span></p>
                         ${task.updates.map(update => `
