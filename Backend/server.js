@@ -8,9 +8,9 @@ app.use(express.json());
 
 const pool = new Pool({
     user: 'postgres',
-    host: 'localhost',
+    host: 'postgres',
     database: 'hr_task_management',
-    password: 'Veera@0134',
+    password: 'admin123',
     port: 5432,
 });
 
@@ -75,7 +75,7 @@ app.put('/api/tasks/:id', async (req, res) => {
     }
 });
 
-const PORT = 3000;
+const PORT = 3062;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
