@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: veera16-postgres
+    ports:
+      - "5491:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: hr_task_management
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - task-net
+
+  backend:
+    build: ./Backend
+    container_name: veera16-backend
+    ports:
+      - "3062:3062"
+    depends_on:
+      - postgres
+    networks:
+      - task-net
+
+  frontend:
+    build: ./Frontend
+    container_name: veera16-frontend
+    ports:
+      - "8235:80"
+    depends_on:
+      - backend
+    networks:
+      - task-net
+
+  hr:
+    build: ./HR
+    container_name: veera16-hr
+    ports:
+      - "8236:80"
+    depends_on:
+      - backend
+    networks:
+      - task-net
+
+volumes:
+  pgdata:
+
+networks:
+  task-net:
+
